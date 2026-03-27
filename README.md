@@ -83,3 +83,20 @@ docker-compose up -d --build
 ### Prevención de Doble Voto
 Gracias a la naturaleza de Hyperledger Fabric, cada "Voto" se inserta como un Asset en la cadena. Como la clave primaria del Asset es tu ID Hasheado de estudiante, si intentas usar o ingresar este mismo ID en la plataforma nuevamente para votar, la red Fabric denegará la creación del bloque. El frontend captará este rechazo e indicará un error de "Doble voto detectado".
 
+
+---
+
+## 4. Funcionalidades Avanzadas de Demostración
+
+Para hacer más didáctica la presentación del proyecto, se han incorporado dos herramientas interactivas que prueban las capacidades únicas de una Blockchain y el consenso distribuido:
+
+### 4.1. Recibos Criptográficos de Auditoría
+Al emitir un voto exitosamente, el navegador generará y descargará automáticamente un archivo de texto (`.txt`) para el usuario, sirviendo como un comprobante criptográfico.
+- **¿Para qué sirve?:** Actúa como trazabilidad para el votante. Permite al estudiante conservar una prueba inmutable de que su voto está en el Ledger (con marca de tiempo y fragmento del log original de la transacción).
+- **Seguridad:** Como el recibo solo guarda el Hash provisto por el sistema Zero-Knowledge Proof inventado, ni el tribunal ni agentes externos pueden relacionar el papel con la persona real.
+
+### 4.2. Simulador de Tolerancia a Fallos ("Chaos Monkey")
+En el panel lateral derecho del frontend, verás una herramienta para administrar a las organizaciones y probar qué tan resistente es la infraestructura.
+- **Tumbar a la Organización 2:** Al dar clic en "Tumbar Org2", el backend apagará intencionalmente el servidor principal de la segunda universidad (`peer0.org2.example.com`). Si un estudiante intenta votar en este estado, el Smart Contract detendrá la elección y lanzará un error porque **no hay consenso suficiente** (solo la Org1 está activa).
+- **Restaurando el flujo:** Al pulsar "Restaurar", el nodo volverá a la vida de inmediato. Así se demuestra a la audiencia cómo las redes descentralizadas pueden recuperar sus servicios tras una caída abrupta y cómo sus rigurosas reglas impiden registrar datos mientras los validadores estén parcialmente desconectados.
+
