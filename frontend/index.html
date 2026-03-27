@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoteChain - Sistema Descentralizado</title>
+    <!-- Tailwind CSS (CDN para rapidez) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para el dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800">
+
+    <nav class="bg-indigo-600 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">🎓 VoteChain (Fabric Auth)</h1>
+            <span class="bg-green-500 px-3 py-1 rounded-full text-sm font-semibold animate-pulse">Red Activa</span>
+        </div>
+    </nav>
+
+    <main class="container mx-auto mt-8 px-4 grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Tarjetón de Votación -->
+        <section class="lg:col-span-2 bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold border-b pb-2 mb-4 text-gray-700">🗳️ Emitir Voto (Zero-Knowledge)</h2>
+            
+            <div class="mb-6 bg-gray-50 p-4 rounded border">
+                <label class="block text-sm font-medium text-gray-700 mb-2" for="studentId">
+                    ID de Estudiante (Será Hashed en el Cliente)
+                </label>
+                <input type="text" id="studentId" placeholder="Ej. 10023456" 
+                    class="w-full px-4 py-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                <p class="text-xs text-gray-500 mt-2">🔒 Tu ID real nunca se envía al servidor. Usaremos SHA-256 para anonimizarlo y prevenir doble voto.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="candidates-container">
+                <!-- Tarjetas -->
+                <button onclick="castVote('Candidato_A')" class="relative bg-white border-2 border-gray-200 p-4 rounded-xl hover:border-indigo-500 hover:shadow-md transition-all text-center group">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Alice" alt="Candidato A" class="w-24 h-24 mx-auto bg-indigo-100 rounded-full mb-3">
+                    <h3 class="font-bold text-gray-700 group-hover:text-indigo-600">Candidato A</h3>
+                </button>
+                <button onclick="castVote('Candidato_B')" class="relative bg-white border-2 border-gray-200 p-4 rounded-xl hover:border-indigo-500 hover:shadow-md transition-all text-center group">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Bob" alt="Candidato B" class="w-24 h-24 mx-auto bg-green-100 rounded-full mb-3">
+                    <h3 class="font-bold text-gray-700 group-hover:text-indigo-600">Candidato B</h3>
+                </button>
+                <button onclick="castVote('Voto_Blanco')" class="relative bg-white border-2 border-gray-200 p-4 rounded-xl hover:border-gray-500 hover:shadow-md transition-all text-center group">
+                    <div class="w-24 h-24 mx-auto bg-gray-200 rounded-full mb-3 flex items-center justify-center text-3xl">⬜</div>
+                    <h3 class="font-bold text-gray-700 group-hover:text-gray-800">Voto en Blanco</h3>
+                </button>
+            </div>
+
+            <!-- Area de Consola / Toast -->
+            <div id="log-container" class="mt-8 bg-gray-900 border-l-4 border-indigo-500 text-green-400 p-4 rounded shadow font-mono text-sm h-32 overflow-y-auto hidden">
+                <p>> Esperando interacciones con la blockchain...</p>
+            </div>
+        </section>
+
+        <!-- Dashboard en Tiempo Real -->
+        <aside class="space-y-8">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-gray-700">📊 Escrutinio (En Vivo)</h2>
+                <div class="relative h-64 w-full">
+                    <canvas id="resultsChart"></canvas>
+                </div>
+                <button onclick="fetchResults()" class="mt-4 w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 border border-gray-300 rounded shadow">
+                    🔄 Sincronizar Ledger
+                </button>
+            </div>
+
+            <!-- Explorador de Bloques / Registro de Transacciones -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold border-b pb-2 mb-4 text-gray-700">⛓️ Txs Recientes</h2>
+                <ul id="block-list" class="space-y-3 font-mono text-xs text-gray-600 overflow-y-auto max-h-48">
+                    <li>Cargando transacciones...</li>
+                </ul>
+            </div>
+        </aside>
+
+    </main>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

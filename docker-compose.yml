@@ -1,0 +1,30 @@
+services:
+  vote-api:
+    build: 
+      context: ./backend
+    container_name: votechain_api
+    ports:
+      - "8000:8000"
+    volumes:
+      # MUY IMPORTANTE: Se monta el socket de docker para que el contenedor pueda 
+      # hacer `docker exec cli ...` hacia el contenedor CLI de Hyperledger Fabric
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - fabric-network # DEBE COINCIDIR con el nombre de red de tu test-network
+
+  vote-frontend:
+    image: nginx:alpine
+    container_name: votechain_frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    networks:
+      - fabric-network
+
+# Conectamos este compose a la red externa previamente creada por Fabric
+networks:
+  fabric-network:
+    external: true
+    # Por lo general es fabric_test en la ultima version
+    name: fabric_test
