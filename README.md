@@ -100,3 +100,15 @@ En el panel lateral derecho del frontend, verás una herramienta para administra
 - **Tumbar a la Organización 2:** Al dar clic en "Tumbar Org2", el backend apagará intencionalmente el servidor principal de la segunda universidad (`peer0.org2.example.com`). Si un estudiante intenta votar en este estado, el Smart Contract detendrá la elección y lanzará un error porque **no hay consenso suficiente** (solo la Org1 está activa).
 - **Restaurando el flujo:** Al pulsar "Restaurar", el nodo volverá a la vida de inmediato. Así se demuestra a la audiencia cómo las redes descentralizadas pueden recuperar sus servicios tras una caída abrupta y cómo sus rigurosas reglas impiden registrar datos mientras los validadores estén parcialmente desconectados.
 
+### 4.3. Explorador Avanzado del Ledger (World State)
+Se ha incorporado una vista especializada accesible desde `http://localhost:8080/ledger.html` (o dando clic en el botón al final del Dashboard).
+- **Análisis de Bloques:** Muestra en tiempo real una simulación cibernética del "World State" de Fabric y el bloque Génesis. 
+- **Transparencia en Crudo (Raw Data):** Extrae directamente del chaincode de Fabric la estructura JSON de cada activo confirmando los parámetros criptográficos del voto. Sirve puramente para auditar y verificar visualmente que tu base de datos no es SQL tradicional, sino un Ledger descentralizado clave-valor real.
+
+---
+
+## 5. Arquitectura del Consenso en VoteChain
+El sistema de escrutinio distribuye las responsabilidades en dos actores usando **Raft (Crash Fault Tolerant)**:
+1. **Fase de Aprobación (Endorsement):** Los nodos peer de la `Org1` y la `Org2` evaluan bajo qué condiciones ocurre un voto, aprueban bajo su firma digital que no hay trampas operando el Chaincode internamente.
+2. **Fase de Ordenamiento (Orderer/Raft):** Los ordenadores usan el algoritmo de consenso **Raft** para ponerse de acuerdo secuencialmente en el orden de los votos masivos que llegan y empaquetarlos permanentemente en cripto-bloques.
+3. **Fase de Validación:** Todo el ecosistema actualiza su copia inmutable conocida como Ledger o Libro Mayor.

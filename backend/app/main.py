@@ -60,6 +60,13 @@ def fetch_results():
         "registros_totales": len(counts)
     }
 
+@app.get("/resultados/raw")
+def fetch_raw_results():
+    success, data = get_all_votes()
+    if not success:
+        return []
+    return data
+
 @app.get("/bloques")
 def get_blocks():
     """
