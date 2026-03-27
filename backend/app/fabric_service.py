@@ -19,10 +19,10 @@ def submit_vote(student_hash: str, candidate: str):
     Envía un voto 'CreateAsset' al chaincode usando el contenedor CLI.
     En la simulación:
     - ID = student_hash (Para prevenir doble voto gracias a Fabric que no admite Assets con el mismo ID)
-    - Color = "VOTO"
-    - Size = 1
+    - Color = "VOTO"  (solo sirve como filtro en el main para contar votos, no tiene otra función) 
+    - Size = 1        (tampoco sirve de nada, pero es un campo requerido por el chaincode)
     - Owner = candidate
-    - AppraisedValue = 1
+    - AppraisedValue = 1 (tampoco sirve de nada, pero es un campo requerido por el chaincode)
     """
     args_json = json.dumps({
         "function": "CreateAsset",

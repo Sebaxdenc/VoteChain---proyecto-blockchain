@@ -9,7 +9,7 @@ Esta aplicación funciona como una interfaz web y un API Gateway que se comunica
 ## 1. Prerrequisitos: Levantar Hyperledger Fabric
 
 Antes de levantar el sistema web, necesitas tener corriendo la red de Hyperledger Fabric (la red blockchain subyacente).
-Se asume que tienes instalado [Fabric Samples](https://hyperledger-fabric.readthedocs.io/en/latest/install.html).
+Se asume que tienes Docker Desktop corriendo en tu computadora y tambien que tienes instalado [Fabric Samples](https://hyperledger-fabric.readthedocs.io/en/latest/install.html).
 
 ### 1.1 Iniciar la Test-Network y el Chaincode
 Abre una terminal (WSL/Linux o Git Bash) y dirígete al directorio de `fabric-samples/test-network`:
