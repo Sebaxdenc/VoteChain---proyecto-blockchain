@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoteChain - Explorador de Bloques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .block-card { animation: slideIn 0.5s ease-out forwards; }
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .connection-line {
+            width: 2px;
+            height: 40px;
+            background: #4ade80; /* green-400 */
+            margin-left: 24px;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-gray-200 font-sans min-h-screen">
+
+    <nav class="bg-slate-800 text-white p-4 shadow-lg border-b border-slate-700">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <span class="text-indigo-400">⛓️ VoteChain</span> Explorer
+            </h1>
+            <div class="text-sm font-mono bg-slate-900 px-3 py-1 rounded border border-slate-600 shadow-inner">
+                Canal: <span class="text-green-400">mychannel</span> | Chaincode: <span class="text-green-400">basic</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto mt-8 px-4 max-w-4xl pb-16">
+        
+        <!-- Header -->
+        <div class="mb-8 flex justify-between items-end border-b border-slate-700 pb-4">
+            <div>
+                <h2 class="text-3xl font-bold text-white mb-2">Ledger Inmutable</h2>
+                <p class="text-slate-400">Inspeccionando el estado mundial (World State) de la blockchain.</p>
+            </div>
+            <button onclick="fetchLedger()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded font-semibold flex items-center gap-2 transition-colors">
+                <span>🔄 Sincronizar</span>
+            </button>
+        </div>
+
+        <div id="stats-banner" class="grid grid-cols-3 gap-4 mb-10 hidden">
+            <div class="bg-slate-800 p-4 rounded text-center border top-border border-slate-700 shadow-lg">
+                <p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Total Activos (Votos)</p>
+                <p id="stat-total" class="text-3xl font-bold text-white">0</p>
+            </div>
+            <div class="bg-slate-800 p-4 rounded text-center border border-slate-700 shadow-lg">
+                <p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Última Actualización</p>
+                <p id="stat-time" class="text-lg font-bold text-white mt-1">--:--:--</p>
+            </div>
+            <div class="bg-slate-800 p-4 rounded text-center border border-slate-700 shadow-lg">
+                <p class="text-slate-400 text-xs uppercase tracking-wider mb-1">Salud Red</p>
+                <p class="text-xl font-bold text-green-400 mt-1">Sincronizada</p>
+            </div>
+        </div>
+
+        <!-- Timeline de Bloques/Activos -->
+        <div id="ledger-container" class="space-y-0 relative">
+            <div class="text-center p-10 text-slate-500">
+                Conectando con la red Hyperledger Fabric...
+            </div>
+        </div>
+
+        <!-- Génesis Block Dummy -->
+        <div class="mt-4 connection-line hidden genesis-line"></div>
+        <div id="genesis-block" class="hidden mt-0">
+            <div class="flex items-start gap-4">
+                <div class="bg-slate-700 rounded-full p-2 border-2 border-slate-500 z-10 shrink-0 shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+                    🌍
+                </div>
+                <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 w-full opacity-70">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-blue-400 font-bold font-mono text-sm">Bloque 0 (Génesis)</h3>
+                    </div>
+                    <div class="font-mono text-xs text-slate-400">
+                        HASH: 000000000000000000000000000000000000000000000000<br>
+                        Channel 'mychannel' created.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+
+        async function fetchLedger() {
+            const container = document.getElementById('ledger-container');
+            
+            try {
+                // Usamos el endpoint oculto en plural pero que trae la data RAW
+                const response = await fetch(`${API_URL}/resultados/raw`);
+                const data = await response.json();
+                
+                document.getElementById('stats-banner').classList.remove('hidden');
+                document.querySelector('.genesis-line').classList.remove('hidden');
+                document.getElementById('genesis-block').classList.remove('hidden');
+                
+                document.getElementById('stat-time').innerText = new Date().toLocaleTimeString();
+
+                container.innerHTML = "";
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = `<div class="p-8 text-center text-slate-500">No hay activos registrados en el ledger mundial.</div>`;
+                    document.getElementById('stat-total').innerText = "0";
+                    return;
+                }
+
+                // Filtrar solo nuestros votos e invertirlos (del más nuevo al más viejo)
+                const votos = data.filter(a => a.Color === "VOTO");
+                document.getElementById('stat-total').innerText = votos.length;
+
+                // Para simular la cadena visualmente, le damos el index como "Block #"
+                votos.forEach((asset, index) => {
+                    // Calculamos el índice simulado (si hay 5 votos, el primero será Bloque 5, luego 4...)
+                    const blockNumber = index + 1;
+                    
+                    const blockHTML = `
+                        <div class="block-card flex items-start gap-4 mb-0" style="animation-delay: ${index * 0.1}s">
+                            <div class="bg-indigo-900 rounded-full p-2 border-2 border-indigo-500 z-10 shrink-0 shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+                                📦
+                            </div>
+                            <div class="bg-slate-800 rounded-lg p-4 border border-slate-700 w-full shadow-lg hover:border-indigo-500 transition-colors group">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="text-indigo-400 font-bold font-mono text-sm">Registro #${blockNumber}</h3>
+                                    <span class="bg-green-900 text-green-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-wider border border-green-800">Confirmed (Org1/Org2)</span>
+                                </div>
+                                <div class="bg-slate-900 p-3 rounded border border-slate-700 overflow-x-auto">
+                                    <div class="text-xs font-mono text-slate-300">
+                                        <span class="text-purple-400">"ID_Activo"</span>: <span class="text-yellow-300">"${asset.ID}"</span>,<br>
+                                        <span class="text-purple-400">"Dueño_(Voto)"</span>: <span class="text-green-300">"${asset.Owner}"</span>,<br>
+                                        <span class="text-purple-400">"Color_Identificador"</span>: <span class="text-yellow-300">"${asset.Color}"</span>
+                                    </div>
+                                </div>
+                                <div class="mt-3 text-xs text-slate-500 font-mono flex justify-between">
+                                    <span>Algoritmo de Identidad: SHA-256 ZKP</span>
+                                    <span class="group-hover:text-indigo-400 transition-colors">>> Inmutable</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="connection-line block-card" style="animation-delay: ${index * 0.1}s"></div>
+                    `;
+                    container.innerHTML += blockHTML;
+                });
+
+            } catch (error) {
+                container.innerHTML = `<div class="p-8 text-center text-red-500">Error conectando con la Blockchain Gateway.</div>`;
+            }
+        }
+
+        window.onload = fetchLedger;
+    </script>
+</body>
+</html>

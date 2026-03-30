@@ -53,13 +53,75 @@ async function castVote(candidate) {
         addLog(`Asset (Voto) insertado en el Ledger exitosamente.`);
         studentIdInput.value = ""; // Limpiamos el input
 
+        // (NUEVO) Generar Recibo Criptográfico para el usuario
+        generarReciboCriptografico(hashedId, candidate, data.transaction_details || "TX_MOCKEADA_POR_CLI");
+
         // Refrescar resultados asincronamente
         setTimeout(fetchResults, 1000);
         setTimeout(fetchRecentBlocks, 1000);
 
     } catch (error) {
-        addLog(`Error de Conexión: No se pudo contactar al API Gateway.`, "text-red-500");
+        addLog(`Error de Conexión: La red no pudo lograr el consenso. Revisa el estado de los Peers.`, "text-red-500");
         console.error(error);
+    }
+}
+
+// NUEVA FUNCIÓN: Descargar PDF/TXT del Recibo Inteligente
+function generarReciboCriptografico(hash, candidate, cli_logs) {
+    // Tomamos la fecha exacta del voto desde el equipo local
+    const fecha = new Date().toISOString();
+    
+    const textoRecibo = `
+=========================================================
+     VOTECHAIN - RECIBO DE VOTACIÓN CRIPTOGRÁFICO
+=========================================================
+Fecha y Hora (UTC)  : ${fecha}
+Hash Estudiante (ID): ${hash}
+Elección Registrada : ${candidate}
+---------------------------------------------------------
+Este documento certifica criptográficamente mediante 
+Hyperledger Fabric que el voto ha sido contado y es 
+INMUTABLE al haber obtenido firma de consenso de nodos.
+
+Log Parcial del Ledger: 
+${cli_logs.substring(0, 200)}...
+=========================================================
+Conserve este archivo. Ninguna autoridad puede 
+relacionar su Hash ZKP con su identidad real.
+`;
+
+    // Crea un Blob (archivo virtual) y forzamos su descarga
+    const blob = new Blob([textoRecibo], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Recibo_VoteChain_${hash.substring(0,6)}.txt`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+
+    addLog(`🧾 Recibo criptográfico generado y descargado con éxito.`, "text-blue-400");
+}
+
+// NUEVA FUNCIÓN: Simulador de Tolerancia a Fallos
+async function tumbarRed(estado) {
+    // Si estado == true, apagamos peer0.org2. Si es false, lo encendemos.
+    const accion = estado ? "apagando" : "encendiendo";
+    addLog(`⚠️ Modo Dios: ${accion} Organización 2...`, "text-yellow-500 font-bold");
+    
+    try {
+        const response = await fetch(`${API_URL}/tumbar?status=${estado}`, {
+            method: 'POST'
+        });
+        const result = await response.json();
+        addLog(`🔧 Respuesta del Host: ${result.message}`, estado ? "text-red-400" : "text-green-400");
+        
+        if(estado) {
+            alert("Org 2 Tumbada: ¡Intenta votar ahora! Verás cómo el Contrato Inteligente rechaza la transacción porque no puede llegar a ningún consenso sin la validación de la Facultad de Derecho.");
+        } else {
+            alert("Org 2 Arriba: La red ha sanado. Puedes volver a votar con normalidad.");
+        }
+    } catch (e) {
+        addLog(`Error al manipular el contenedor de Docker.`, "text-red-600");
     }
 }
 

@@ -57,6 +57,22 @@
 
         <!-- Dashboard en Tiempo Real -->
         <aside class="space-y-8">
+            <!-- SIMULADOR DE CAÍDA DE RED (Punto 3) -->
+            <div class="bg-red-50 rounded-lg shadow-lg border-2 border-red-500 p-4">
+                <h2 class="text-lg font-bold text-red-700 flex items-center gap-2">
+                    <span>⚠️</span> Simulador de Tolerancia a Fallos
+                </h2>
+                <p class="text-xs text-red-600 mt-2 mb-3">Tumba intencionalmente la Facultad de Derecho (Org2) para probar que el contrato exige consenso de ambas partes.</p>
+                <div class="flex gap-2">
+                    <button onclick="tumbarRed(true)" class="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-2 px-3 rounded shadow">
+                        🔌 Tumbar Org2
+                    </button>
+                    <button onclick="tumbarRed(false)" class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-3 rounded shadow">
+                        ⚡ Restaurar Org2
+                    </button>
+                </div>
+            </div>
+
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-xl font-bold border-b pb-2 mb-4 text-gray-700">📊 Escrutinio (En Vivo)</h2>
                 <div class="relative h-64 w-full">
@@ -73,6 +89,11 @@
                 <ul id="block-list" class="space-y-3 font-mono text-xs text-gray-600 overflow-y-auto max-h-48">
                     <li>Cargando transacciones...</li>
                 </ul>
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                    <a href="ledger.html" target="_blank" class="w-full block text-center bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded shadow transition-colors">
+                        🔍 Explorador Avanzado del Ledger
+                    </a>
+                </div>
             </div>
         </aside>
 

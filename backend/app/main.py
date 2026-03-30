@@ -60,6 +60,13 @@ def fetch_results():
         "registros_totales": len(counts)
     }
 
+@app.get("/resultados/raw")
+def fetch_raw_results():
+    success, data = get_all_votes()
+    if not success:
+        return []
+    return data
+
 @app.get("/bloques")
 def get_blocks():
     """
@@ -77,3 +84,23 @@ def get_blocks():
     ]
     
     return recent_transactions
+
+@app.post("/tumbar")
+def toggle_peer(status: bool):
+    """
+    Simulador didáctico: Pausa o reanuda el nodo de la Org2 manipulando los contenedores 
+    de Docker de la máquina host.
+    """
+    import subprocess
+    action = "stop" if status else "start"
+    # Tratamos de tumbar al peer de la red de prueba
+    cmd = ["docker", "exec", "votechain_api", "docker", action, "peer0.org2.example.com"]
+    # Pero como votebhain_api tiene mapeado /var/run/docker.sock, en realidad lo mandamos directo al host
+    cmd_direct = ["docker", action, "peer0.org2.example.com"]
+    
+    try:
+        subprocess.run(cmd_direct, capture_output=True, check=False)
+        return {"message": f"Organización 2 ha sido {'tumbada' if status else 'restaurada'} exitosamente."}
+    except Exception as e:
+        return {"message": f"Error manipulando la red: {str(e)}"}
+
